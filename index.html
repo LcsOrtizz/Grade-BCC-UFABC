@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Minha Grade BCC</title>
+<meta name="description" content="Matriz sugerida do BCC UFABC 2023 para marcar matérias cursadas e aprovadas.">
+<meta name="theme-color" content="#f5f7fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1520" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Grade BCC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: matriz sugerida do BCC 2023 em faixas por ano (3 quadrimestres cada); cabeçalho com medidores e "próximas matérias"; cada matéria é uma etiqueta que se grifa ao clicar */
+:root{
+  --paper:#f5f7fa; --card:#ffffff; --ink:#14213a; --muted:#5b6a80; --line:#d8dfe8; --band:#eaeff5;
+  --accent:#1f5fbf; --bct:#8a96a8; --bcc:#1f5fbf; --ol:#0f7f6e; --free:#b0612a;
+  --hl-pass:#9be8a8; --hl-now:#ffe066; --pass-ink:#11632a; --now-ink:#7a5800; --warn:#a33b2b;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f1520; --card:#171f2d; --ink:#e7edf6; --muted:#9aa8bd; --line:#2a3546; --band:#131b28;
+  --accent:#6ea3f2; --bct:#7d8aa0; --bcc:#6ea3f2; --ol:#4fc7b4; --free:#e3a06c;
+  --hl-pass:rgba(88,214,120,.42); --hl-now:rgba(255,214,64,.40); --pass-ink:#8ee6a4; --now-ink:#ffd95c; --warn:#f08a7a;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#0f1520; --card:#171f2d; --ink:#e7edf6; --muted:#9aa8bd; --line:#2a3546; --band:#131b28;
+  --accent:#6ea3f2; --bct:#7d8aa0; --bcc:#6ea3f2; --ol:#4fc7b4; --free:#e3a06c;
+  --hl-pass:rgba(88,214,120,.42); --hl-now:rgba(255,214,64,.40); --pass-ink:#8ee6a4; --now-ink:#ffd95c; --warn:#f08a7a;
+  color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:30px}
+h1,h2{font-family:var(--f-display);text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+h2{font-size:21px;font-weight:800;letter-spacing:-.01em}
+.lede{color:var(--muted);max-width:64ch;margin:8px 0 0}
+.titlerow{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.sync{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:5px 12px;background:var(--card)}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.sync[data-k="ok"] i{background:var(--pass-ink)} .sync[data-k="wait"] i{background:var(--now-ink)} .sync[data-k="local"] i{background:var(--warn)}
+
+header{display:grid;gap:20px}
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.meter{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:7px}
+.meter .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.meter b{font-family:var(--f-display);font-size:16px}
+.meter.total{border-color:var(--ink)}
+.num{white-space:nowrap;font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.bar .p{background:var(--pass-ink)} .bar .n{background:var(--now-ink);opacity:.8}
+.meter small{color:var(--muted);font-size:12.5px}
+
+.next{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.next h2{font-size:17px}
+.next ol{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.next li{font-size:13.5px;border:1px solid var(--line);border-radius:99px;padding:4px 11px;background:var(--paper)}
+.next li span{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-left:6px}
+.next p{margin:0;color:var(--muted);font-size:13px}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13.5px;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:26px;height:12px;border-radius:3px;border:1px solid var(--line)}
+.sw.pass{background:var(--hl-pass);border-color:transparent}.sw.now{background:var(--hl-now);border-color:transparent}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+button.ghost{font:500 13px var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
+button.ghost:hover{border-color:var(--muted)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.confirm{display:inline-flex;gap:8px;align-items:center;font-size:13px}
+.confirm .danger{border-color:var(--warn);color:var(--warn)}
+
+.year{display:grid;gap:12px;background:var(--band);border-radius:14px;padding:16px}
+.year-head{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.year-head p{margin:0;color:var(--muted);font-size:13px}
+.quads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+@media (max-width:820px){.quads{grid-template-columns:1fr}}
+.quad{display:grid;gap:8px;min-width:0}
+.quad-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.quad-h .num{text-transform:none;letter-spacing:0;font-size:12px}
+.quad.here .quad-h{color:var(--accent)}
+.quad.here .quad-h::after{content:"você está aqui";font-size:10.5px;letter-spacing:.06em;background:var(--accent);color:var(--card);border-radius:99px;padding:1px 8px;margin-left:auto}
+.quad.done .quad-h{color:var(--pass-ink)}
+
+.chip{all:unset;box-sizing:border-box;cursor:pointer;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--tag);
+  border-radius:8px;padding:8px 11px 9px;display:grid;gap:2px;min-width:0;transition:border-color .15s, transform .1s}
+.chip:hover{border-color:var(--muted);border-left-color:var(--tag)}
+.chip:active{transform:scale(.985)}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chip .meta{display:flex;justify-content:space-between;gap:8px;font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip .name{font-weight:500;font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+.chip .name span{padding:0 .15em;-webkit-box-decoration-break:clone;box-decoration-break:clone;border-radius:.2em}
+.chip .st{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.chip[data-s="pass"] .name span{background:linear-gradient(100deg,transparent 0,var(--hl-pass) .25em,var(--hl-pass) calc(100% - .25em),transparent 100%)}
+.chip[data-s="now"] .name span{background:linear-gradient(100deg,transparent 0,var(--hl-now) .25em,var(--hl-now) calc(100% - .25em),transparent 100%)}
+.chip[data-s="pass"] .st{color:var(--pass-ink)} .chip[data-s="now"] .st{color:var(--now-ink)}
+.chip[data-t="bct"]{--tag:var(--bct)} .chip[data-t="bcc"]{--tag:var(--bcc)} .chip[data-t="ol"]{--tag:var(--ol)} .chip[data-t="free"]{--tag:var(--free)}
+.chip[data-t="ol"],.chip[data-t="free"],.chip.slot{border-style:dashed;border-left-style:solid}
+
+.backup{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.backup h2{font-size:17px}
+.backup p{margin:0;color:var(--muted);font-size:13.5px;max-width:70ch}
+.backup textarea{width:100%;min-height:76px;font:12px var(--f-mono);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical}
+.backup .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.backup .msg{font-size:13px;color:var(--muted)}
+footer{color:var(--muted);font-size:12.5px;max-width:82ch;display:grid;gap:6px}
+footer p{margin:0}
+@media (prefers-reduced-motion: reduce){.chip{transition:none}.chip:active{transform:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="titlerow">
+      <div>
+        <h1>Minha Grade BCC</h1>
+        <p class="lede">Matriz sugerida do Bacharelado em Ciência da Computação da UFABC (PPC 2023), com o BC&amp;T incluído. Clique numa matéria para grifar: <strong>cursando</strong> → <strong>aprovada</strong> → limpa.</p>
+      </div>
+      <button class="ghost" id="backupBtn" type="button" aria-expanded="false" aria-controls="backup">Backup / trocar de aparelho</button>
+    </div>
+    <div class="backup" id="backup" hidden>
+      <h2>Levar suas marcações para outro aparelho</h2>
+      <p>As marcações ficam salvas neste aparelho. Para passar para outro, copie o código abaixo, mande para você mesmo (WhatsApp, e-mail) e cole no outro aparelho em "Colar código".</p>
+      <label for="codeOut" class="msg">Seu código</label>
+      <textarea id="codeOut" readonly></textarea>
+      <div class="row"><button class="ghost" id="copyBtn" type="button">Copiar código</button><span class="msg" id="copyMsg" role="status"></span></div>
+      <label for="codeIn" class="msg">Colar código de outro aparelho</label>
+      <textarea id="codeIn" placeholder="Cole aqui o código copiado no outro aparelho"></textarea>
+      <div class="row"><button class="ghost" id="importBtn" type="button">Colar código</button><span class="msg" id="importMsg" role="status"></span></div>
+    </div>
+    <div class="meters" id="meters"></div>
+    <div class="next" id="next"></div>
+    <div class="toolbar">
+      <div class="legend">
+        <span><i class="sw pass"></i>Aprovada</span>
+        <span><i class="sw now"></i>Cursando</span>
+        <span><i class="dot" style="background:var(--bct)"></i>BC&amp;T</span>
+        <span><i class="dot" style="background:var(--bcc)"></i>Obrigatória BCC</span>
+        <span><i class="dot" style="background:var(--ol)"></i>Opção limitada</span>
+        <span><i class="dot" style="background:var(--free)"></i>Livre</span>
+      </div>
+      <div id="resetBox"></div>
+    </div>
+  </header>
+
+  <main class="wrap" id="years" style="gap:18px"></main>
+
+  <footer>
+    <p>Para se formar: 84 créditos obrigatórios do BC&amp;T, 118 obrigatórios do BCC, 24 de opção limitada, 16 livres e 328 h de extensão. A matriz sugerida é a ordem recomendada pela UFABC; você pode adiantar matérias se tiver vaga.</p>
+    <p>Quem entrou antes de 2023 pode seguir a matriz do ano de ingresso. Confira sempre no SIGAA.</p>
+  </footer>
+</div>
+
+<script>
+// [código, nome, créditos, tipo] — tipo: bct | bcc | ol | free
+const MATRIZ = [
+ [ // 1º ano
+  ["1º quadri",[["BCS0001-15","Base Experimental das Ciências Naturais",3,"bct"],["BIS0005-15","Bases Computacionais da Ciência",2,"bct"],["BIS0003-15","Bases Matemáticas",4,"bct"],["BIK0102-15","Estrutura da Matéria",3,"bct"],["BIL0304-15","Evolução e Diversificação da Vida na Terra",3,"bct"],["HUM-1","Eixo Humanidades 1",3,"bct"]]],
+  ["2º quadri",[["BCM0504-15","Natureza da Informação",3,"bct"],["BCJ0204-15","Fenômenos Mecânicos",5,"bct"],["BCN0402-15","Funções de Uma Variável",4,"bct"],["BCN0404-15","Geometria Analítica",3,"bct"],["BCL0306-15","Biodiversidade: Interações entre Organismos e Ambiente",3,"bct"]]],
+  ["3º quadri",[["BCM0505-22","Processamento da Informação",4,"bct"],["BCJ0205-15","Fenômenos Térmicos",4,"bct"],["BCN0407-15","Funções de Várias Variáveis",4,"bct"],["BCL0307-15","Transformações Químicas",5,"bct"]]]
+ ],
+ [ // 2º ano
+  ["4º quadri",[["BCM0506-15","Comunicação e Redes",3,"bct"],["BCJ0203-15","Fenômenos Eletromagnéticos",5,"bct"],["BCN0405-15","Introdução às Equações Diferenciais Ordinárias",4,"bct"],["BIN0406-15","Introdução à Probabilidade e à Estatística",3,"bct"],["MCBM006-23","Matemática Discreta",4,"bcc"]]],
+  ["5º quadri",[["HUM-2","Eixo Humanidades 2",3,"bct"],["BCL0308-15","Bioquímica: Estrutura, Propriedade e Funções de Biomoléculas",5,"bct"],["BCK0103-15","Física Quântica",3,"bct"],["MCCC014-23","Programação Estruturada",4,"bcc"],["LIV-1","Livre 1",4,"free"]]],
+  ["6º quadri",[["HUM-3","Eixo Humanidades 3",3,"bct"],["MCTA006-17","Circuitos Digitais",4,"bcc"],["MCTB001-17","Álgebra Linear",6,"bcc"],["MCCC001-23","Algoritmos e Estruturas de Dados I",4,"bcc"]]]
+ ],
+ [ // 3º ano
+  ["7º quadri",[["MCTA018-13","Programação Orientada a Objetos",4,"bcc"],["MCTA024-13","Sistemas Digitais",4,"bcc"],["MCCC010-23","Matemática Discreta II",4,"bcc"],["MCCC002-23","Algoritmos e Estruturas de Dados II",4,"bcc"]]],
+  ["8º quadri",[["OL-1","Opção Limitada 1",4,"ol"],["MCTA004-17","Arquitetura de Computadores",4,"bcc"],["MCCC008-23","Inteligência Artificial",4,"bcc"],["MCCC003-23","Algoritmos em Grafos",4,"bcc"]]],
+  ["9º quadri",[["OL-2","Opção Limitada 2",4,"ol"],["MCTA022-17","Redes de Computadores",4,"bcc"],["MCTA033-15","Engenharia de Software",4,"bcc"],["MCCC004-23","Análise de Algoritmos I",4,"bcc"],["BIS0002-15","Projeto Dirigido",2,"bct"]]]
+ ],
+ [ // 4º ano
+  ["10º quadri",[["OL-3","Opção Limitada 3",4,"ol"],["MCTA009-13","Computadores, Ética e Sociedade",2,"bcc"],["MCCC015-23","Programação Funcional",4,"bcc"],["MCCC005-23","Análise de Algoritmos II",4,"bcc"],["LIV-2","Livre 2",4,"free"]]],
+  ["11º quadri",[["OL-4","Opção Limitada 4",4,"ol"],["MCCC012-23","Modelagem de Banco de Dados",4,"bcc"],["MCCC007-23","Computação Gráfica",4,"bcc"],["MCZA008-17","Interação Humano-Computador",4,"bcc"]]],
+  ["12º quadri",[["OL-5","Opção Limitada 5",4,"ol"],["MCCC011-23","Metodologia e Escrita Científica para Computação",2,"bcc"],["MCTA026-13","Sistemas Operacionais",4,"bcc"],["MCCC009-23","Linguagens Formais e Autômatos",4,"bcc"]]]
+ ],
+ [ // 5º ano
+  ["13º quadri",[["OL-6","Opção Limitada 6",4,"ol"],["MCCC006-23","Compiladores e Interpretadores",4,"bcc"]]],
+  ["14º quadri",[["LIV-3","Livre 3",4,"free"],["MCTA025-13","Sistemas Distribuídos",4,"bcc"]]],
+  ["15º quadri",[["LIV-4","Livre 4",4,"free"],["MCTA023-17","Segurança de Dados",4,"bcc"],["MCCC017-23","Trabalho de Conclusão de Curso em Computação",12,"bcc"]]]
+ ]
+];
+const TYPE_LABEL={bct:"BC&T",bcc:"BCC",ol:"Opção limitada",free:"Livre"};
+const LABEL={"":"Falta","now":"Cursando","pass":"Aprovada"};
+const NEXT={"":"now","now":"pass","pass":""};
+const ALL=[]; MATRIZ.forEach(y=>y.forEach(([q,l])=>l.forEach(x=>ALL.push({code:x[0],name:x[1],cr:x[2],t:x[3],q}))));
+
+const CACHE="grade-bcc-v1";
+let state={};
+try{state=JSON.parse(localStorage.getItem(CACHE)||"{}")||{}}catch(e){state={}}
+const cache=()=>{try{localStorage.setItem(CACHE,JSON.stringify(state))}catch(e){}};
+
+// ---------- salvar ----------
+// Fora do Claude não existe a nuvem da conta, então tudo fica no localStorage do navegador.
+function queueSave(){cache()}
+
+// ---------- backup ----------
+const backupEl=document.getElementById("backup"), backupBtn=document.getElementById("backupBtn");
+const codeOut=document.getElementById("codeOut"), codeIn=document.getElementById("codeIn");
+const encode=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+const decode=t=>JSON.parse(decodeURIComponent(escape(atob(t.trim()))));
+backupBtn.addEventListener("click",()=>{
+  backupEl.hidden=!backupEl.hidden; backupBtn.setAttribute("aria-expanded",String(!backupEl.hidden));
+  if(!backupEl.hidden) codeOut.value="GRADEBCC1:"+encode(state);
+});
+document.getElementById("copyBtn").addEventListener("click",()=>{
+  const msg=document.getElementById("copyMsg");
+  const done=()=>msg.textContent="Copiado.";
+  const fallback=()=>{codeOut.select();msg.textContent="Selecionado. Use copiar do teclado."};
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(codeOut.value).then(done,fallback); else fallback();
+});
+document.getElementById("importBtn").addEventListener("click",()=>{
+  const msg=document.getElementById("importMsg");
+  try{
+    const raw=codeIn.value.trim().replace(/^GRADEBCC1:/,"");
+    const data=decode(raw); const known=new Set(ALL.map(a=>a.code)); const next={};
+    for(const [k,v] of Object.entries(data)) if(known.has(k)&&(v==="now"||v==="pass")) next[k]=v;
+    state=next; cache(); refresh(); codeOut.value="GRADEBCC1:"+encode(state); codeIn.value="";
+    msg.textContent=`Pronto: ${Object.keys(next).length} matérias carregadas.`;
+  }catch(e){msg.textContent="Código inválido. Copie de novo o código inteiro no outro aparelho."}
+});
+
+// ---------- render ----------
+const chipEls=new Map();
+function chip(it){
+  const b=document.createElement("button");
+  b.type="button";b.className="chip"+(/^(HUM|OL|LIV)-/.test(it.code)?" slot":"");b.dataset.t=it.t;
+  const codeTxt=/^(HUM|OL|LIV)-/.test(it.code)?TYPE_LABEL[it.t]==="BC&T"?"Humanidades":TYPE_LABEL[it.t]:it.code;
+  b.innerHTML=`<span class="meta"><span>${codeTxt}</span><span>${it.cr} cr</span></span><span class="name"><span></span></span><span class="st"></span>`;
+  b.querySelector(".name span").textContent=it.name;
+  b.addEventListener("click",()=>{const n=NEXT[state[it.code]||""];if(n)state[it.code]=n;else delete state[it.code];paint(it);summary();queueSave()});
+  chipEls.set(it.code,b);paint(it,b);return b;
+}
+function paint(it,b=chipEls.get(it.code)){const s=state[it.code]||"";b.dataset.s=s;b.querySelector(".st").textContent=LABEL[s];b.setAttribute("aria-label",`${it.name}, ${it.cr} créditos, ${LABEL[s]}`)}
+const yearsEl=document.getElementById("years");
+const quadEls=[];
+MATRIZ.forEach((y,yi)=>{
+  const sec=document.createElement("section");sec.className="year";
+  const cr=y.reduce((a,[,l])=>a+l.reduce((b,x)=>b+x[2],0),0);
+  sec.innerHTML=`<div class="year-head"><h2>${yi+1}º ano</h2><p>${cr} créditos</p></div>`;
+  const qs=document.createElement("div");qs.className="quads";
+  y.forEach(([q,l])=>{
+    const d=document.createElement("div");d.className="quad";
+    d.innerHTML=`<div class="quad-h"><span>${q}</span><span class="num">${l.reduce((a,x)=>a+x[2],0)} cr</span></div>`;
+    const items=ALL.filter(a=>a.q===q);items.forEach(it=>d.appendChild(chip(it)));
+    quadEls.push({el:d,items});qs.appendChild(d);
+  });
+  sec.appendChild(qs);yearsEl.appendChild(sec);
+});
+function refresh(){ALL.forEach(it=>paint(it));summary()}
+function tally(f){let t=0,p=0,n=0;ALL.filter(f).forEach(it=>{t+=it.cr;if(state[it.code]==="pass")p+=it.cr;else if(state[it.code]==="now")n+=it.cr});return{t,p,n}}
+function summary(){
+  const rows=[["BC&T",tally(i=>i.t==="bct"),"obrigatórias do ingresso"],["Obrigatórias BCC",tally(i=>i.t==="bcc"),"específicas do curso"],["Opção limitada",tally(i=>i.t==="ol"),"6 matérias de 4 créditos"],["Livres",tally(i=>i.t==="free"),"qualquer disciplina"],["Total",tally(()=>true),"para o diploma de BCC"]];
+  document.getElementById("meters").innerHTML=rows.map(([nm,s,sub],i)=>`<div class="meter${i===4?" total":""}"><div class="top"><b>${nm}</b><span class="num">${s.p} / ${s.t}</span></div>
+    <div class="bar"><i class="p" style="width:${s.p/s.t*100}%"></i><i class="n" style="width:${s.n/s.t*100}%"></i></div>
+    <small>${sub}${s.n?` · ${s.n} cr cursando`:""}</small></div>`).join("");
+  let here=-1;
+  quadEls.forEach((q,i)=>{const done=q.items.every(it=>state[it.code]==="pass");q.el.classList.toggle("done",done);q.el.classList.remove("here");if(!done&&here<0)here=i});
+  if(here>=0)quadEls[here].el.classList.add("here");
+  const pend=ALL.filter(it=>it.t!=="free"&&!state[it.code]).slice(0,6);
+  const cur=ALL.filter(it=>state[it.code]==="now");
+  const nx=document.getElementById("next");
+  nx.innerHTML=`<h2>Próximas na ordem da matriz</h2>${pend.length?`<ol>${pend.map(it=>`<li></li>`).join("")}</ol>`:"<p>Nada pendente. Parabéns!</p>"}<p>${cur.length?`Cursando agora: ${cur.length} matéria${cur.length>1?"s":""}.`:"Marque as que está cursando para elas saírem desta lista."}</p>`;
+  nx.querySelectorAll("li").forEach((li,i)=>{li.textContent=pend[i].name;const s=document.createElement("span");s.textContent=pend[i].q;li.appendChild(s)});
+}
+summary();
+
+// ---------- reset ----------
+const box=document.getElementById("resetBox");
+function resetUI(){box.innerHTML='<button class="ghost" id="resetBtn" type="button">Limpar marcações</button>';document.getElementById("resetBtn").onclick=ask}
+function ask(){box.innerHTML='<span class="confirm">Apagar tudo neste aparelho? <button class="ghost danger" id="yes" type="button">Apagar</button><button class="ghost" id="no" type="button">Cancelar</button></span>';
+  document.getElementById("yes").onclick=()=>{state={};refresh();queueSave();resetUI()};
+  document.getElementById("no").onclick=resetUI}
+resetUI();
+
+// ---------- app instalável / offline ----------
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
